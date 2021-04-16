@@ -13,7 +13,7 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
   InstanceType:
-    Description: WebServer EC2 instance type
+    Description: CollegeProject WebServer EC2 instance type
     Type: String
     Default: t3.small
     AllowedValues: [t2.nano, t2.micro, t2.small, t2.medium, t2.large, t2.xlarge, t2.2xlarge,
@@ -48,7 +48,7 @@ Resources:
       Tags:
       -
         Key: Name
-        Value: FromJenkinsToAWSWebServer
+        Value: CollegeProjectWebServer
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -78,6 +78,10 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       InstanceId: !Ref EC2Instance
+      Tags:
+      -
+        Key: Name
+        Value: CollegeProjectWebServerIP
 Outputs:
   InstanceId:
     Description: InstanceId of the newly created EC2 instance
