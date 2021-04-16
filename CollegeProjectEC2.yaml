@@ -72,7 +72,6 @@ Resources:
     Properties:
       InstanceId: !Ref EC2Instance
       VolumeId: !Ref NewVolume
-      Device: /dev/xvda
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
