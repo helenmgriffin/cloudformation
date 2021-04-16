@@ -67,7 +67,6 @@ Resources:
     Properties: 
       Size: 8
       VolumeType: gp2
-      Iops: 100
       AvailabilityZone: !GetAtt EC2Instance.AvailabilityZone
   MountPoint:
     Type: AWS::EC2::VolumeAttachment
