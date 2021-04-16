@@ -76,7 +76,7 @@ Resources:
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
-      InstanceId: !Ref 'InstanceType'
+      InstanceId: !Ref EC2Instance
 Outputs:
   InstanceId:
     Description: InstanceId of the newly created EC2 instance
