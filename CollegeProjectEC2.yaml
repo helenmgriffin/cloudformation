@@ -66,11 +66,11 @@ Resources:
     Type: AWS::EC2::Volume
     Properties:
       Size: 8
-      AvailabilityZone: !GetAtt Ec2Instance.AvailabilityZone
+      AvailabilityZone: !GetAtt EC2Instance.AvailabilityZone
   MountPoint:
     Type: AWS::EC2::VolumeAttachment
     Properties:
-      InstanceId: !Ref Ec2Instance
+      InstanceId: !Ref EC2Instance
       VolumeId: !Ref NewVolume
       Device: /dev/xvda
   MyEIP:
