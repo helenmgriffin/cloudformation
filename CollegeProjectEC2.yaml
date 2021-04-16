@@ -65,11 +65,10 @@ Resources:
   NewVolume:
     Type: AWS::EC2::Volume
     Properties: 
-      InstanceId: !Ref EC2Instance
       Size: 8
       VolumeType: gp2
       Iops: 100
-      AvailabilityZone: !GetAtt Ec2Instance.AvailabilityZone
+      AvailabilityZone: !GetAtt EC2Instance.AvailabilityZone
   MountPoint:
     Type: AWS::EC2::VolumeAttachment
     Properties:
