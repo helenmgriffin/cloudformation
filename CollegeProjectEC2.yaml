@@ -65,6 +65,7 @@ Resources:
   NewVolume:
     Type: AWS::EC2::Volume
     Properties: 
+      InstanceId: !Ref EC2Instance
       Size: 8
       VolumeType: gp2
       Iops: 100
