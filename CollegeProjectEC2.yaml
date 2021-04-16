@@ -62,18 +62,6 @@ Resources:
         FromPort: 80
         ToPort: 80
         CidrIp: '0.0.0.0/0'
-  NewVolume:
-    Type: AWS::EC2::Volume
-    Properties: 
-      Size: 8
-      VolumeType: gp2
-      AvailabilityZone: !GetAtt EC2Instance.AvailabilityZone
-  MountPoint:
-    Type: AWS::EC2::VolumeAttachment
-    Properties:
-      InstanceId: !Ref EC2Instance
-      VolumeId: !Ref NewVolume
-      Device : /dev/xvdh
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
