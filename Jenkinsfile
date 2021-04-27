@@ -3,13 +3,36 @@ def $elasticIP = ''
 
 pipeline{
     agent any
+    environment {
+        ARTIFACT_NAME = 'CollegeProject.zip'
+        AWS_S3_BUCKET = 'collegeproject-zip'
+        AWS_EB_APP_NAME = 'CollegeProject'
+        AWS_EB_ENVIRONMENT = 'CollegeProject-env'
+        AWS_EB_APP_VERSION = "${env.BUILD_NUMBER}"
+    }
     stages{
         stage('Get CloudFormation File') {
            steps {
              git url: 'https://github.com/helenmgriffin/cloudformation.git', branch: 'main'
              }
         }
-        stage('Tear Down Dev Server')
+        stage('Deploy to Elastic Beanstalk')
+        {
+            steps
+            {
+                script
+                {
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'AWSCredentails2', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                        bat 'aws s3 cp c:/CollegeProjectWebSite/%ARTIFACT_NAME% s3://%AWS_S3_BUCKET%/%ARTIFACT_NAME%'
+                        bat 'aws elasticbeanstalk create-application-version --application-name %AWS_EB_APP_NAME% --version-label %AWS_EB_APP_VERSION% --source-bundle S3Bucket=%AWS_S3_BUCKET%,S3Key=%ARTIFACT_NAME%'
+                        bat 'aws elasticbeanstalk update-environment --application-name %AWS_EB_APP_NAME% --environment-name %AWS_EB_ENVIRONMENT% --version-label %AWS_EB_APP_VERSION%'
+                    }
+                
+                }
+            }
+            
+        }
+        stage('AWS: Tear Down Dev Server')
         {
             steps
             {
@@ -22,20 +45,20 @@ pipeline{
                 }
             }
         }
-        stage('Provision Dev Server')
+        stage('AWS: Provision Dev Server')
         {
             steps
             {
                 script
                 {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'AWSCredentails2', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                        bat 'aws cloudformation create-stack --stack-name CollegeProjectDevServer --template-body file://CollegeProjectEC2.yaml --parameters ParameterKey=InstanceType,ParameterValue=t2.micro ParameterKey=KeyName,ParameterValue=DevWebServer ParameterKey=SSHLocation,ParameterValue=40.113.68.180/32'
+                        bat 'aws cloudformation create-stack --stack-name CollegeProjectDevServer --template-body file://CollegeProjectEC2.yaml --parameters ParameterKey=InstanceType,ParameterValue=t2.micro ParameterKey=KeyName,ParameterValue=DevWebServer'
                         bat 'aws cloudformation wait stack-create-complete --stack-name "CollegeProjectDevServer'
                     }
                 }
             }
         }
-        stage('Install Docker on Dev Server')
+        stage('AWS: Install Docker on Dev Server')
         {
             steps
             {
@@ -68,7 +91,7 @@ pipeline{
                 }
             }
         }
-        stage('Run Docker Container on Dev Server')
+        stage('AWS: Run Docker Container on Dev Server')
         {
             steps
             {
@@ -85,7 +108,7 @@ pipeline{
     post{
       always{
         emailext body: "${currentBuild.currentResult}: Job   ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
-        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], 
         subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}"
         }
       }
